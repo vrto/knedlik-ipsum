@@ -4,7 +4,7 @@ var ipsum = require('./ipsum.js');
 
 var server = http.createServer(function (request, response) {
     ipsum.knedlikIpsum(function(ipsumResult) {
-        response.writeHead(200, {"Content-Type": "application/json"});
+        response.writeHead(200, {"Content-Type": "application/json; charset=utf8"});
         response.end(JSON.stringify(ipsumResult));
     });
 });
