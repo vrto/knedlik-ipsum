@@ -1,9 +1,12 @@
 var http = require('http');
+var url = require('url');
 
-var ipsum = require('./ipsum.js');
+var ipsum = require('./ipsum.js').knedlikIpsum;
 
 var server = http.createServer(function (request, response) {
-    ipsum.knedlikIpsum(function(ipsumResult) {
+    var queryData = url.parse(request.url, true).query;
+
+    ipsum.generate(function(ipsumResult) {
         response.writeHead(200, {"Content-Type": "application/json; charset=utf8"});
         response.end(JSON.stringify(ipsumResult));
     });
