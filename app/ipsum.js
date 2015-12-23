@@ -26,7 +26,7 @@ var knedlikIpsum = {
     createPragraph: function(sentenceCount, words) {
         var self = this;
 
-        var sentenceLen = Math.floor((Math.random() * 20) + 4);
+        var sentenceLen = Math.floor((Math.random() * 7) + 4);
         var sentence = [];
         for (var i = 0; i < sentenceLen; i++) {
             var word = self.randomWord(words);
