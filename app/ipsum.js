@@ -2,7 +2,7 @@ var fs = require('fs');
 var _ = require('underscore');
 
 var knedlikIpsum = {
-    generate: function(ipsumConsumer) {
+    generate: function(ipsumRequest) {
         var self = this;
 
         fs.readFile('./app/words.json', 'utf8', function (err, data) {
@@ -10,17 +10,28 @@ var knedlikIpsum = {
 
             var words = JSON.parse(data);
             var result = {
-                paragraphCount: 4,
-                paragraphSentences: 20,
-                paragraphs: [
-                    self.createPragraph(20, words),
-                    self.createPragraph(20, words),
-                    self.createPragraph(20, words),
-                    self.createPragraph(20, words)
-                ]
+                paragraphCount: parseInt(ipsumRequest.count),
+                paragraphLength: parseInt(ipsumRequest.length),
+                paragraphs: self.createPragraphs(ipsumRequest.count, ipsumRequest.length, words)
             };
-            ipsumConsumer(result);
+            ipsumRequest.done(result);
         });
+    },
+
+    createPragraphs: function(paragraphsCount, paragraphLength, words) {
+        var paragraphs = [];
+        for (var i = 0; i < paragraphsCount; i++) {
+            paragraphs.push(this.createPragraph(paragraphLength, words));
+        }
+        return paragraphs;
+    },
+
+    createPragraph: function(sentenceCount, words) {
+        var paragraph = [];
+        for (var i = 0; i < sentenceCount; i++) {
+            paragraph.push(this.createSentence(words));
+        }
+        return paragraph;
     },
 
     createSentence: function (words) {
@@ -39,14 +50,6 @@ var knedlikIpsum = {
         joined += '.';
         joined = self.capitalizeFirstLetter(joined);
         return joined;
-    },
-
-    createPragraph: function(sentenceCount, words) {
-        var paragraph = [];
-        for (var i = 0; i < sentenceCount; i++) {
-            paragraph.push(this.createSentence(words));
-        }
-        return paragraph;
     },
 
     randomWord: function(words) {

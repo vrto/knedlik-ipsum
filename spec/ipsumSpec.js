@@ -1,36 +1,38 @@
 var ipsum = require('../app/ipsum.js').knedlikIpsum;
 var _ = require('underscore');
+var request = require('request');
+var server = require('../app/server.js');
 
-describe('Knedlik Ipsum', function() {
+describe('Knedlik Ipsum', function () {
     var words = ['foo', 'bar', 'baz'];
 
-    it('returns a random word', function() {
+    it('returns a random word', function () {
         var w = ipsum.randomWord(words);
         expect(_.contains(words, w)).toBe(true);
     });
 
-    it('creates a sentence that starts with a capital letter and ends with a dot', function() {
+    it('creates a sentence that starts with a capital letter and ends with a dot', function () {
         var sentence = ipsum.createSentence(words);
         verifySentenceSemantics(sentence);
     });
 
-    it('it creates a resonably sized sentence', function() {
+    it('it creates a resonably sized sentence', function () {
         var sentences = [];
         for (var i = 0; i < 100; i++) {
             sentences.push(ipsum.createSentence(words));
         }
 
-        _.each(sentences, function(sentence) {
+        _.each(sentences, function (sentence) {
             verifySentenceSize(sentence);
         });
     });
 
-    it('should create paragraph consisting of specified number of sentences', function() {
+    it('should create paragraph consisting of specified number of sentences', function () {
         var paragraphSize = 10;
         var paragraph = ipsum.createPragraph(paragraphSize, words);
 
         expect(paragraph.length).toBe(paragraphSize);
-        _.each(paragraph, function(sentence) {
+        _.each(paragraph, function (sentence) {
             verifySentenceSize(sentence);
             verifySentenceSemantics(sentence);
         })
@@ -52,4 +54,43 @@ describe('Knedlik Ipsum', function() {
         expect(countWordsInSentence(sentence)).toBeLessThan(11);
     }
 
+});
+
+describe('Ipsum Server', function () {
+
+    afterAll(function() {
+        server.closeServer();
+    });
+
+    describe('GET /', function () {
+        it('should return ipsum JSON', function(done) {
+            request.get('http://localhost:5000/', function (error, response, body) {
+                var ipsum = JSON.parse(body);
+                expect(ipsum.paragraphCount).toBe(4);
+                expect(ipsum.paragraphLength).toBe(20);
+                expect(ipsum.paragraphs.length).toBe(4);
+                done();
+            });
+        });
+
+        it('should react to paragraphCount query parameter', function(done) {
+            request.get('http://localhost:5000?paragraphCount=10', function (error, response, body) {
+                var ipsum = JSON.parse(body);
+                expect(ipsum.paragraphCount).toBe(10);
+                expect(ipsum.paragraphs.length).toBe(10);
+                done();
+            });
+        });
+
+        it('should react to paragraphLength query parameter', function(done) {
+            request.get('http://localhost:5000?paragraphLength=10', function (error, response, body) {
+                var ipsum = JSON.parse(body);
+                expect(ipsum.paragraphLength).toBe(10);
+                _.each(ipsum.paragraphs, function(p) {
+                    expect(p.length).toBe(10);
+                });
+                done();
+            });
+        });
+    });
 });
