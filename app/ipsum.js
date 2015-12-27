@@ -23,10 +23,12 @@ var knedlikIpsum = {
         });
     },
 
-    createPragraph: function(sentenceCount, words) {
+    createSentence: function (words) {
         var self = this;
+        var reasonableMinimum = 4;
+        var reasonableMaximum = 7;
 
-        var sentenceLen = Math.floor((Math.random() * 7) + 4);
+        var sentenceLen = Math.floor((Math.random() * reasonableMaximum) + reasonableMinimum);
         var sentence = [];
         for (var i = 0; i < sentenceLen; i++) {
             var word = self.randomWord(words);
@@ -37,6 +39,14 @@ var knedlikIpsum = {
         joined += '.';
         joined = self.capitalizeFirstLetter(joined);
         return joined;
+    },
+
+    createPragraph: function(sentenceCount, words) {
+        var paragraph = [];
+        for (var i = 0; i < sentenceCount; i++) {
+            paragraph.push(this.createSentence(words));
+        }
+        return paragraph;
     },
 
     randomWord: function(words) {
