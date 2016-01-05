@@ -9,8 +9,8 @@ var server = http.createServer(function(request, response) {
     var queryData = url.parse(request.url, true).query;
 
     var ipsumRequest = {
-        count: queryData.paragraphCount ? queryData.paragraphCount : defaultCount,
-        length: queryData.paragraphLength ? queryData.paragraphLength : defaultLength,
+        count: queryData.paragraphCount || defaultCount,
+        length: queryData.paragraphLength || defaultLength,
         done: function(ipsumResult) {
             response.writeHead(200, {"Content-Type": "application/json; charset=utf8"});
             response.end(JSON.stringify(ipsumResult));
